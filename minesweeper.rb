@@ -17,6 +17,7 @@ class Grid
     mark_neighboring_mines
     @user_grid = print_grid_dev
     @revealed = []
+    @tiles = get_tiles
     game_loop
   end
 
@@ -28,6 +29,16 @@ class Grid
       end
     end
     array
+  end
+
+  def get_tiles
+    tiles_array = []
+    @rows.each do |row|
+      row.each do |tile|
+        tiles_array << tile
+      end
+    end
+    tiles_array
   end
 
   def game_loop
@@ -50,6 +61,7 @@ class Grid
       # flag_tile(x,y)
     when "r"
       reveal_tile(x,y)
+      reveal_neighbors(x,y)
     else
       puts "Invalid entry. Please try again."
       get_command
@@ -58,17 +70,24 @@ class Grid
 
   def reveal_tile(x,y)
     @revealed << [x,y]
+    
   end
 
   def reveal_neighbors(x,y)
-    @rows.each do |row|
-      row.each do |tile|
-        if tile.coordinates == [x,y]
-          tile.neighbor_coordinates
-        end
+    tile = @rows[y][x]
+    tile.neighbor_coordinates.each do |neighbor|
+      x1,y1 = neighbor
+      temp_tile = @rows[y1][x1]
+      if @revealed.include?([x1,y1])
+        return
+      elsif temp_tile.neighboring_mines == 0
+        reveal_tile(x1, y1)
+        reveal_neighbors(x1, y1)
       end
     end
+
   end
+
 
   def game_end?
     (@revealed & @mines).length >= 1
