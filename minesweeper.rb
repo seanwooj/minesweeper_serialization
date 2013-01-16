@@ -5,7 +5,6 @@ class Game
 
 
 
-
 end
 
 class Grid
@@ -13,16 +12,28 @@ class Grid
 
   def initialize
     @rows = place_mines(create_grid)
-    @user_grid = print_grid_dev
     # debugger
     @mines = get_mine_coordinates
+    mark_neighboring_mines
+    @user_grid = print_grid_dev
     @revealed = []
     game_loop
+  end
+
+  def tile_array
+    array = []
+    @rows.each do |row|
+      row.each do |tile|
+        array << each
+      end
+    end
+    array
   end
 
   def game_loop
     until game_end?
       print_grid
+      p get_mine_coordinates
       get_command
     end
     puts "you lose"
@@ -47,6 +58,16 @@ class Grid
 
   def reveal_tile(x,y)
     @revealed << [x,y]
+  end
+
+  def reveal_neighbors(x,y)
+    @rows.each do |row|
+      row.each do |tile|
+        if tile.coordinates == [x,y]
+          tile.neighbor_coordinates
+        end
+      end
+    end
   end
 
   def game_end?
@@ -77,6 +98,7 @@ class Grid
   def mark_neighboring_mines
     @rows.each do |row|
       row.each do |tile|
+
         tile.neighboring_mines = (tile.neighbor_coordinates & @mines).length
       end
     end
@@ -100,7 +122,7 @@ class Grid
         elsif tile.neighboring_mines != nil
           formatted_array[y][x] = tile.neighboring_mines
         else
-          formatted_array[y][x] = "_"
+          formatted_array[y][x] = tile.neighboring_mines.to_i
         end
       end
 
@@ -125,6 +147,8 @@ class Grid
             formatted_array[y][x] = "*"
           elsif tile.neighboring_mines != nil
             formatted_array[y][x] = tile.neighboring_mines
+          else
+            formatted_array[y][x] = tile.neighboring_mines.to_i
           end
         else
           formatted_array[y][x] = "X"
@@ -180,6 +204,7 @@ class Tile
 
 end
 
+game = Grid.new
 
 
 
